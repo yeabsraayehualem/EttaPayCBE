@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Define the custom attribute -->
+    <declare-styleable name="CustomTheme">
+        <attr name="buttonBackground" format="reference|color" />
+    </declare-styleable>
+</resources>
