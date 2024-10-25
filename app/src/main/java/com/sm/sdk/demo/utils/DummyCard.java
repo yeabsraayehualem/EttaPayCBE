@@ -7,6 +7,8 @@ import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.sunmi.peripheral.printer.SunmiPrinterService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,9 +20,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import com.neapay.spdh.Functions;
-import com.sunmi.peripheral.printer.SunmiPrinterService;
-import com.neapay.spdh.SpdhMessage;
 public class DummyCard {
     private static final Logger log = LoggerFactory.getLogger(DummyCard.class);
     String track2Data = "";
@@ -37,8 +36,9 @@ public class DummyCard {
         this.context = context;
         this.sunmiPrinterService = sunmiPrinterService;  // Use the existing SunmiPrinterService
     }
+
     public void printReceipt(String refNo, String date, String merchantNo,
-                             String terminalId, String cardNo, String amount, Bitmap signature,String marchentName) {
+                             String terminalId, String cardNo, String amount, Bitmap signature, String marchentName) {
         try {
             // Start printer buffer
             sunmiPrinterService.enterPrinterBuffer(true);
@@ -114,6 +114,7 @@ public class DummyCard {
             Log.d("SunmiPrinterService", "Print result, code: " + code + ", message: " + msg);
         }
     };
+
     public String getTrack2Data() {
         return track2Data;
     }
@@ -208,9 +209,9 @@ public class DummyCard {
         }
     }
 
-    public void makePaymentRequest(String track2data, String req, String add, String amount, Bitmap signiture,String marchentName,String billingAddress) {
+    public void makePaymentRequest(String track2data, String req, String add, String amount, Bitmap signiture, String marchentName, String billingAddress) {
         try {
-
+            boolean success = false;
             Date now = new Date();
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
             String formattedDateTime = formatter.format(now);
@@ -226,6 +227,7 @@ public class DummyCard {
             SpdhMessage m = new SpdhMessage();
             m.setMessageType("A");
             m.setTerminalId("ETTA0001");
+            System.out.println("v tag data: "+m.getVTagData());
 
             m.setDownloadKey("V");
             m.unpack(Functions.sendReceive(m.pack()));
@@ -233,29 +235,29 @@ public class DummyCard {
 
             Log.d("Keydownload request RS:", m.getResponseCode());
 
-            m = new SpdhMessage();
-            m.setTerminalId("ETTA0001");
-            m.setPurchaseTags();
-            m.setMessageType("F");
-            m.setTransactionCode("00");
-            m.setFlag1("0");
-            m.setFlag2("5");
-            m.setAmount(amount);
-            m.setRetailer("ETTA00000001");
-            m.setSequenceNumber("1001611");
-            m.setTrack2Data(";" + track2data);
-            m.setEmvRequestData(req);
-            m.setEmvAdditionalData(add);
-            m.setEmvSupplementaryData("019F6E04220000009F660436C04000");
-            m.unpack(Functions.sendReceive(m.pack()));
-            Log.d("PurchaseTransaction RS:", m.getResponseCode());
-
+//            m = new SpdhMessage();
+//            m.setTerminalId("ETTA0001");
+//            m.setPurchaseTags();
+//            m.setMessageType("F");
+//            m.setTransactionCode("00");
+//            m.setFlag1("0");
+//            m.setFlag2("5");
+//            m.setAmount(amount);
+//            m.setRetailer("ETTA00000001");
+//            m.setSequenceNumber("01");
+//            m.setTrack2Data(";" + track2data);
+//            m.setEmvRequestData(req);
+//            m.setEmvAdditionalData(add);
+//            m.setEmvSupplementaryData("019F6E04220000009F660436C04000");
+//            m.unpack(Functions.sendReceive(m.pack()));
+//            Log.d("PurchaseTransaction RS:", m.getResponseCode());
 
 
 //            TODO: this should be after the response is succesfull
-            int a = Integer.parseInt(amount);
-            printReceipt("909998uu","2024-10-21 09:50:10",m.getRetailer(),m.getTerminalId(),track2data.split("=")[0],String.valueOf(a),signiture,marchentName);
-
+            if (!success) {
+                int a = Integer.parseInt(amount);
+                printReceipt("909998uu", "2024-10-21 09:50:10", m.getRetailer(), m.getTerminalId(), track2data.split("=")[0], String.valueOf(a), signiture, marchentName);
+            }
         } catch (Exception e) {
             Log.d("PaymentRequestException", e.getMessage(), e);
         }

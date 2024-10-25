@@ -491,7 +491,7 @@ public class ICProcessActivity extends BaseAppCompatActivity {
 
     private void addToExistingAmount(String result) {
         try {
-            double existingAmount = getExistingAmount();
+            double existingAmount = Double.parseDouble(mEditAmount.getText().toString());
             double newAmount = existingAmount + Double.parseDouble(result);
             updateAmount(newAmount);
         } catch (NumberFormatException e) {
@@ -510,9 +510,9 @@ public class ICProcessActivity extends BaseAppCompatActivity {
     }
 
     private void updateAmount(double amount) {
-
+        System.out.println(mEditAmount.getX());
         mEditAmount.setText(amount+"");
-        mProcessStep=0;
+
     }
     private void changeText(String key) {
         String amount = mEditAmount.getText().toString();
